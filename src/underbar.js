@@ -70,11 +70,18 @@ var _ = { };
   // Return all elements of an array that pass a truth test.
   _.filter = function(collection, test) {
     var output=[];
-    for (var i=0; i<collection.length;i++){
-      if (test(collection[i])){
-        output.push(collection[i]);
+
+    _.each(collection, function(item, index, collection){ 
+      if (test(item)){
+        output.push(item);
       }
-    }
+    } );
+
+    //for (var i=0; i<collection.length;i++){
+    //  if (test(collection[i])){
+    //    output.push(collection[i]);
+    //  }
+    //}
     return output;
   };
 
@@ -82,34 +89,50 @@ var _ = { };
   _.reject = function(collection, test) {
     // TIP: see if you can re-use _.filter() here, without simply
     // copying code in and modifying it
-    var output= [];
-    var pass = _.filter(collection, test);
-    for (var i=0; i<collection.length;i++){
-      if (pass.indexOf(collection[i]) === -1)
-        output.push(collection[i]);
-    }
-    return output;
+    return _.filter(collection,function(item){
+      return !test(item);
+    })
+
+    //var output= [];
+    //var pass = _.filter(collection, test);
+    //for (var i=0; i<collection.length;i++){
+    //  if (pass.indexOf(collection[i]) === -1)
+    //    output.push(collection[i]);
+    //}
+    //return output;
   };
 
   // Produce a duplicate-free version of the array.
   _.uniq = function(array) {
-    var output = [];
+    /*var output = [];
     array = array.sort(function(a,b){return (a-b)});
     for (var i=0;i<array.length;i++){
       if(output.indexOf(array[i]) === -1){
         output.push(array[i]);
       }
     }
-    return output;
+    return output;*/
+
+    var result = {};
+    for (var i= 0; i < array.length; i++){
+      result[array[i]] = true;
+    }
+
+    return (Object.keys(result));
   };
 
 
   // Return the results of applying an iterator to each element.
   _.map = function(array, iterator) {
     var output = [];
-    for(var i=0; i<array.length;i++){
-      output.push(iterator(array[i]));
-    }
+
+    _.each(array, function(item){
+      output.push(iterator(item));
+    });
+
+    //for(var i=0; i<array.length;i++){
+    //  output.push(iterator(array[i]));
+    //}
     return output;
     // map() is a useful primitive iteration function that works a lot
     // like each(), but in addition to running the operation on all
@@ -138,15 +161,22 @@ var _ = { };
   // Note: you will nead to learn a bit about .apply to complete this.
   _.invoke = function(collection, functionOrKey, args) {
     var output =[];
-    for (var i=0; i<collection.length;i++){
+    _.each(collection, function(item){
       if (typeof functionOrKey === "function"){
-        output.push(functionOrKey.apply(collection[i],args));
+        output.push(functionOrKey.apply(item,args));
+      }else{
+        output.push(item[functionOrKey](args));
       }
-      else{
-        output.push(collection[i][functionOrKey](args));
-      }
+    });
 
-    }
+    //for (var i=0; i<collection.length;i++){
+    //  if (typeof functionOrKey === "function"){
+    //    output.push(functionOrKey.apply(collection[i],args));
+    //  }
+    //  else{
+    //    output.push(collection[i][functionOrKey](args));
+    //  }
+    //}
     return output;
   };
 
@@ -307,6 +337,7 @@ var _ = { };
 
     return function() {
       if (alreadyCalled !== arguments) {
+        console.log(this)
         result = func.apply(this, arguments);
         alreadyCalled = arguments;
       } 
@@ -324,8 +355,17 @@ var _ = { };
     if (arguments.length < 3){
       setTimeout(func,wait);
     }else{
-      setTimeout(func(arguments[2],arguments[3]),wait);
+      var input = Array.prototype.slice.call(arguments, 2);
+      setTimeout(function(){
+        func.apply(null, input);
+      },wait);
     }
+
+    //if (arguments.length < 3){
+    //  setTimeout(func,wait);
+    //}else{
+    //  setTimeout(func(arguments[2],arguments[3]),wait);
+    //}
 
   };
 
@@ -363,6 +403,15 @@ var _ = { };
   // of that string. For example, _.sortBy(people, 'name') should sort
   // an array of people by their name.
   _.sortBy = function(collection, iterator) {
+    var output = [];
+    if (typeof iterator === 'string'){
+      _.each(collection, function(value, key, collection){
+        value[iterator]
+      });
+    }
+
+
+
   };
 
   // Zip together two or more arrays with elements of the same index
